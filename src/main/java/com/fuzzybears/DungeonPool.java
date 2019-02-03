@@ -19,13 +19,13 @@ public class DungeonPool {
             if (dungeonNodes.stream().noneMatch(item -> Objects.equals(item.dungeon, dungeon))) {
                 Node newNode = new Node(dungeon, new ArrayList<>());
                 for (Node dungeonNode : dungeonNodes) {
-                    if (doorMatch(dungeon.getExit(), dungeonNode.dungeon.getEntrance())) {
+                    if (dungeon.match(dungeonNode.dungeon)) {
                         if (newNode.exitsTo.stream()
                                            .noneMatch(item -> Objects.equals(item.dungeon, dungeonNode.dungeon))) {
                             newNode.exitsTo.add(dungeonNode);
                         }
                     }
-                    if (doorMatch(dungeon.getEntrance(), dungeonNode.dungeon.getExit())) {
+                    if (dungeonNode.dungeon.match(dungeon)) {
                         if (dungeonNode.exitsTo.stream()
                                                .noneMatch(item -> Objects.equals(item.dungeon, newNode.dungeon))) {
                             dungeonNode.exitsTo.add(newNode);
@@ -35,7 +35,8 @@ public class DungeonPool {
                 dungeonNodes.add(newNode);
             }
         }
-        Guard.checkArgumentValid(dungeonNodes.stream().noneMatch(item -> item.exitsTo.size() == 0), ErrorMessages.INPUT_CONTAINS_NON_CONNECTED_ROOMS);
+        Guard.checkArgumentValid(dungeonNodes.stream().noneMatch(item -> item.exitsTo.size() == 0),
+                                 ErrorMessages.INPUT_CONTAINS_NON_CONNECTED_ROOMS);
     }
 
     public List<Dungeon> createXSequence(int length) {
@@ -59,24 +60,11 @@ public class DungeonPool {
         return dungeonNodes.stream().map(item -> item.dungeon).collect(Collectors.toSet());
     }
 
-    /**
-     * Проверяет что хотябы одна ячейка со значением @Block.AIR совпадает в
-     * у обоих аргументов
-     */
-    private boolean doorMatch(Dungeon.Block[] left, Dungeon.Block[] right) {
-        for (int i = 0; i < left.length; i++) {
-            if (left[i] == Dungeon.Block.AIR && left[i] == right[i]) {
-                return true;
-            }
-        }
-        return false;
-    }
-
     private final class Node {
-        public final Dungeon dungeon;
-        public final List<Node> exitsTo;
+        final Dungeon dungeon;
+        final List<Node> exitsTo;
 
-        public Node(Dungeon dungeon, List<Node> exitsTo) {
+        Node(Dungeon dungeon, List<Node> exitsTo) {
             this.dungeon = dungeon;
             this.exitsTo = exitsTo;
         }

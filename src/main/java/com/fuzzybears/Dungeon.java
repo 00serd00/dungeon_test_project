@@ -19,6 +19,16 @@ public class Dungeon implements Comparable<Dungeon> {
         this.area = area;
     }
 
+    public boolean match(Dungeon nextRoom) {
+        if (nextRoom == null) return false;
+        for (int i = 0; i < this.getExit().length; i++) {
+            if (this.getExit()[i] == Dungeon.Block.AIR && this.getExit()[i] == nextRoom.getEntrance()[i]) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public boolean hasExit() {
         for (Block row : getExit()) {
             if (row == Block.AIR) return true;
